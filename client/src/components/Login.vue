@@ -4,7 +4,7 @@
       <v-flex xs6 offset-xs3>
       <div class="white elevation-2">
         <v-toolbar flat dense class="cyan" dark>
-          <v-toolbar-tittle>Register</v-toolbar-tittle>
+          <v-toolbar-tittle>Login</v-toolbar-tittle>
         </v-toolbar>
 
         <div class="pl-4 pr-4 pt-2 pb-2">
@@ -23,8 +23,8 @@
           <v-btn
             class="cyan"
             dark
-            @click='register'>
-            Register
+            @click='login'>
+            Login
           </v-btn>
         </div>
       </div>
@@ -35,7 +35,7 @@
 <script>
 import AuthenticationService from '@/services/AuthenticationService'
 export default {
-  name: 'Register',
+  name: 'Login',
   data () {
     return {
       email: '',
@@ -43,20 +43,10 @@ export default {
       error: null
     }
   },
-  // watch: {
-  //   email (value) {
-  //     console.log('email has changed', value)
-  //   }
-  // },
-  // mounted () {
-  //   setTimeout(() => {
-  //     this.email = 'blabla'
-  //   }, 2000)
-  // },
   methods: {
-    async register () {
+    async login () {
       try {
-        await AuthenticationService.register({
+        await AuthenticationService.login({
           email: this.email,
           password: this.password
         })

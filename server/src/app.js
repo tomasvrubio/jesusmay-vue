@@ -1,31 +1,20 @@
-const express = require("express"),
-      bodyParser = require("body-parser"),
-      cors = require("cors"), 
-      morgan = require("morgan");
+const config = require('./config/config.js'),
+      express = require('express'),
+      bodyParser = require('body-parser'),
+      cors = require('cors'), 
+      morgan = require('morgan'),
+      mongoose = require('mongoose');
 
 
 const app = express();
-app.use(morgan("combined"));
+app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(cors());
 
+mongoose.connect(config.mongo.connectionString, {useNewUrlParser: true, useCreateIndex: true});
 
-app.get('/status', (req, res) => {
-  res.send({
-    message: "hello world",
-  })
-});
-
-app.post('/register', (req, res) => {
-  res.send({
-    message: `Hello ${req.body.email}! Your user was registered`
-  });
-})
+require('./routes')(app);
 
 
-
-app.listen(process.env.PORT || 8081);
-
-
-console.log("Hello");
-
+app.listen(config.port);
+console.log(`Server started on port ${config.port}`);
