@@ -33,4 +33,12 @@ export default {
   margin-top: 60px;
 }
 
+.danger-alert {
+  color: red;
+}
+
+.required label::after {
+    content: "*";
+}
+
 </style>
