@@ -1,5 +1,4 @@
 const AuthenticationController = require('./controllers/AuthenticationController.js');
-const SongsController = require('./controllers/SongsController.js');
 const WorksController = require('./controllers/WorksController.js');
 
 const AuthenticationControllerPolicy = require('./policies/AuthenticationControllerPolicy.js');
@@ -25,16 +24,16 @@ module.exports = (app) => {
     AuthenticationController.changePass
   )
 
-  app.get('/songs',
-    SongsController.index
-  )
-
-  app.post('/songs',
-    SongsController.post
-  )
-
   app.get('/works',
     WorksController.index
+  )
+
+  app.get('/works/:workId',
+    WorksController.show
+  )
+
+  app.put('/works/:workId',
+    WorksController.put
   )
 
   app.post('/works',

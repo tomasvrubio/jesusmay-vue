@@ -5,7 +5,7 @@ module.exports = {
     try {
       await Work.find({})
       .then (works => {
-        console.log(works)
+        // console.log(works)
         res.send(JSON.stringify(works))
       })
 
@@ -13,6 +13,22 @@ module.exports = {
       console.log(err);
       res.status(500).send({
         error: 'Error ocurred searching works'
+      })
+    } 
+  },
+  async show (req, res) {
+    try {
+      console.log(req.body)
+      await Work.findById(req.params.workId).select('-__v')
+      .then (work => {
+        console.log(work)
+        res.send(JSON.stringify(work))
+      })
+
+    } catch (err) {
+      console.log(err);
+      res.status(500).send({
+        error: `Error ocurred searching work with _id ${req.workId}`
       })
     } 
   },
@@ -28,6 +44,21 @@ module.exports = {
       console.log(err)
       res.status(500).send({
         error: 'Error ocurred trying to create work registration'
+      })
+    } 
+  },
+  async put (req, res) {
+    try {
+      await Work.update({_id:req.params.workId}, req.body)
+      .then (work => {
+        console.log(work)
+        res.send(req.body)
+      })
+
+    } catch (err) {
+      console.log(err)
+      res.status(500).send({
+        error: 'Error ocurred trying to update work'
       })
     } 
   }

@@ -41,11 +41,11 @@
           :rules="[required]"
         ></v-text-field>
 
-        <v-text-field
+        <v-textarea
           label="Notes"
           multi-line
           v-model="work.notes"
-        ></v-text-field>
+        ></v-textarea>
       </panel>
 
       <div class="danger-alert" v-if="error">

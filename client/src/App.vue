@@ -3,7 +3,7 @@
     <v-app>
       <page-header/>
       <main>
-        <img src="./assets/logo.png">
+        <!-- <img src="./assets/logo.png"> -->
         <v-container fluid>
           <router-view/>
         </v-container>

@@ -1,6 +1,6 @@
 <template>
   <v-layout row>
-    <v-flex xs6 offset-xs3>
+    <v-flex xs8 offset-xs2>
       <panel title="Works">
         <v-btn
           slot="action"
@@ -74,9 +74,8 @@ export default {
 </script>
 
 <style scoped>
-.song{
+.song {
   padding: 20px;
-  
 }
 
 .work-name {
