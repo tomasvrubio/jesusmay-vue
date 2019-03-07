@@ -49,7 +49,7 @@ module.exports = {
   },
   async put (req, res) {
     try {
-      await Work.update({_id:req.params.workId}, req.body)
+      await Work.updateOne({_id:req.params.workId}, req.body)
       .then (work => {
         console.log(work)
         res.send(req.body)

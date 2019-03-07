@@ -23,6 +23,7 @@
           v-model="work.phone"
         ></v-text-field>
 
+        <!-- TODO: Aquí tengo que poner un datePicker -->
         <v-text-field
           label="Date Picked"
           class="required"
@@ -94,6 +95,7 @@ export default {
       }
 
       try {
+        this.work.datePicked = new Date(this.work.datePicked)
         await WorksService.post(this.work)
         this.$router.push({
           name: 'works'

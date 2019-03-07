@@ -8,13 +8,11 @@ var workSchema = mongoose.Schema({
   category: {type: String, required: true},
   notes: {type: String},
   state: {type: String},
-  created: {type:Date, default:Date.now},
-  updated: {type: Date},
-})
-
-workSchema.pre('save', function(next){
-  this.updated = Date.now()
-  next()
+},{
+  timestamps: {
+    createdAt: 'created',
+    updatedAt: 'updated'
+  }
 })
 
 var Work = mongoose.model('Work', workSchema)

@@ -3,11 +3,16 @@ var mongoose = require('mongoose'),
   saltRounds = 10;
 
 var userSchema = mongoose.Schema({
-  // name: {type: String, required: true, trim: true},
+  name: {type: String, required: true, trim: true},
 	email: {type: String, required: true, unique:true},
   password: {type: String, required: true},
 	role: {type: String, default: "nobody"},
-	created: {type:Date, default:Date.now},
+	// created: {type:Date, default:Date.now},
+},{
+  timestamps: {
+    createdAt: 'created',
+    updatedAt: 'updated'
+  }
 })
 
 userSchema.pre('save', function(next){
