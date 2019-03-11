@@ -1,13 +1,35 @@
 const {Work, Calendar} = require('../models/index.js'),
       moment = require('moment');
+//TODO: Al final quitar tabla WORK
+
 
 module.exports = {
   async index (req, res) {
     try {
-      await Work.find({})
-      .then (works => {
-        // console.log(works)
-        res.send(JSON.stringify(works))
+      //TODO: Pasar a buscar en Calendar. ¿Cuantos registros quiero que busque?
+
+      //TODO: Quitar
+      // await Work.find({})
+      // .then (works => {
+      //   // console.log(works)
+      //   res.send(JSON.stringify(works))
+      // })
+      //TODO: Me tienen que llamar con dos fechas, la de inicio de búsqueda y la de final. 
+      const dayStart = moment(new Date(req.params.dateStart)).format('YYYYMMDD')
+      const dayEnd = moment(new Date(req.params.dateEnd)).format('YYYYMMDD')
+      // const dayStart = "20190324"
+      // const dayEnd = "20190325"
+
+      //TODO: Ya está replicado igual que works. Sólo me faltaría poder hacer un filtrado para no sacar todo lo que hay en la BBDD. ¿Cómo?
+      await Calendar.aggregate([
+        {$match: {"day": {$gte: dayStart, $lt: dayEnd}}},
+        {$unwind: "$slots"},
+        {$sort: {"slots.datePicked": 1}},
+        {$group: {_id: null, slts: {$push : "$slots"}}},
+        {$project: {_id: 0, slots: "$slts"}}
+      ]).then (works => {
+        console.log(works)
+        res.send(JSON.stringify(works[0].slots))
       })
 
     } catch (err) {
@@ -19,50 +41,108 @@ module.exports = {
   },
   async show (req, res) {
     try {
-      console.log(req.body)
-      await Work.findById(req.params.workId).select('-__v')
-      .then (work => {
-        console.log(work)
-        res.send(JSON.stringify(work))
-      })
+      //TODO: Pasar a utilizar Calendar para extraer estos trabajos. Tendré que descomponer la fecha o bien buscar el objectId entre los objetos SLOT. Debería poder buscar por las dos opciones. ¿Realmente necesito buscar por fecha?
+
+      // db.getCollection('calendars')
+        // .find({day:'20190324'},
+        // {_id:0, slots: {$elemMatch: {hour:'2000'}}})
+
+      //Con objectId y calendar //TODO: Descomentar
+      await Calendar.find({slots: {$elemMatch: {_id:req.params.workId}}}, 
+        {_id:0, slots:{$elemMatch: {_id:req.params.workId}}})
+        .then (work => {
+          console.log(JSON.stringify(work[0].slots[0]))
+          res.send(JSON.stringify(work[0].slots[0]))
+        })
+
+
+      //TODO: Quitar cuando todo esté pasado a Calendar
+      // await Work.findById(req.params.workId).select('-__v')
+      //   .then (work => {
+      //     console.log(work)
+      //     res.send(JSON.stringify(work))
+      //   })
 
     } catch (err) {
       console.log(err);
       res.status(500).send({
-        error: `Error ocurred searching work with _id ${req.workId}`
+        error: `Error ocurred searching work with _id ${req.params.workId}`
       })
     } 
   },
   async post (req, res) {
     try {
-      // TODO: Meter a Calendar por en medio
-      // La lógica debería ser:
-      // 1-buscar que no existe creado ese slot/dia
-      //   1.1-Si existe terminar indicar que no se puede hacer la reserva
-      //   1.2-En caso de no existir el dia pero no estar usado el slot, ¿generarlo? Y continuar
-      // 2-Grabar el work, recuperar el ID
-      // 3-Grabar el evento en Calendar utilizando el ID recuperado. Tendre que hacer un push al array.
 
-      console.log(req.body)
-      console.log(moment(req.body.datePicked).format('YYYYMMDD'))
-      console.log(moment(req.body.datePicked).format('HHmm'))
-      const day = moment(req.body.datePicked).format('YYYYMMDD')
-      const hour = moment(req.body.datePicked).format('HHmm')
-      const calendarWork = {
-        day: day,
-        slots: {
-          hour: hour,
-          workId: "xxxx"
-        }
+      //Para encontrar si hay una reserva hecha a esa hora. Si me devuelve algo es que existe una reserva.
+      //¿Devuelve lo mismo si no hay documento que si no hay hora?
+      // db.calendars
+      // .find({day:"20190503", slots: {$elemMatch: {hour: "1430"}}})
+
+            // await Calendar.find({day:day, slots: {$elemMatch: {hour: hour}}})
+      //   .then ( work => {
+      //     console.log(work)
+      //     res.send(JSON.stringify(work))
+      //   })
+
+      //Para guardar un registro (pero en robomongo me genera infinitos registros repetidos, tengo que ver si me lo hace en mongoose con el unique que he puesto a "hour")
+      // db.calendars
+      //   .findOneAndUpdate({day:"20190503"}, 
+      //   {$push: {
+      //       slots: {"hour":"1400", "name":"Pedro"}
+      //   }}) 
+
+      //Quitar una reserva
+      // db.calendars
+      //   .findOneAndUpdate({day:"20190503"}, 
+      //   {$pull: {
+      //       slots: {"hour":"1400"}
+      //   }})
+ 
+      const day = moment(new Date(req.body.datePicked)).format('YYYYMMDD')
+      const hour = moment(new Date(req.body.datePicked)).format('HHmm')
+
+      const intendedSlot = {
+        hour,
+        name: req.body.name,
+        email: req.body.email,
+        phone: req.body.phone,
+        datePicked: req.body.datePicked,
+        category: req.body.category || null,
+        notes: req.body.notes || null,
+        state: req.body.state || null,
       }
+      console.log(intendedSlot)
 
-      await Calendar.create(calendarWork)
+      await Promise.all([
+        Calendar.find({day}).countDocuments(),
+        Calendar.find({day, slots: {$elemMatch: {hour}}}).countDocuments()
+      ])
+        .then(async ([dayGenerated, slotOcupied]) => {
 
-      await Work.create(req.body)
-      .then (work => {
-        console.log(work)
-        res.send(JSON.stringify(work))
-      })
+          if (slotOcupied) {
+            console.log('Slot ocupied. Use another hour.')
+            return res.send('KO')
+          }
+
+          if (!dayGenerated) {
+            console.log('Day dont exists. Need to create it.')
+            await Calendar.create({day})
+              .then( dayCreated => {
+                console.log(dayCreated)
+              })
+          }
+
+          await Calendar.findOneAndUpdate({ day }, 
+            {
+              $push: {
+                slots: intendedSlot
+              }
+            }, {
+              multi: true
+            })
+
+          return res.send('OK')
+        })
 
     } catch (err) {
       console.log(err)
@@ -73,7 +153,7 @@ module.exports = {
   },
   async put (req, res) {
     try {
-      // TODO: Meter a Calendar por en medio
+      // TODO: Aquí con Calendar lo que tengo que hacer es un pop de elemento que quiero modificar y un push donde lo quiero situar. Tendré que crear el día igual que con post en caso de que no exista.
 
       await Work.updateOne({_id:req.params.workId}, req.body)
       .then (work => {
