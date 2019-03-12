@@ -68,7 +68,10 @@ export default {
   },
   async mounted () {
     // Request for all the works
-    this.works = (await WorksService.index()).data
+    // TODO: Que estas fechas sean variables en función de los datos que se necesiten recuperar para la aplicación
+    const dateStart = new Date('2019 03 01').valueOf()
+    const dateEnd = new Date('2019 04 01').valueOf()
+    this.works = (await WorksService.index(dateStart, dateEnd)).data
   }
 }
 </script>

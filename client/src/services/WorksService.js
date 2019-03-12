@@ -1,8 +1,8 @@
 import Api from '@/services/Api'
 
 export default {
-  index () {
-    return Api().get('works')
+  index (dateStart, dateEnd) {
+    return Api().get(`works/${dateStart}/${dateEnd}`)
   },
   show (workId) {
     return Api().get(`works/${workId}`)

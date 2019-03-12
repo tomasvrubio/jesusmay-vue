@@ -24,7 +24,7 @@ module.exports = (app) => {
     AuthenticationController.changePass
   )
 
-  app.get('/works',
+  app.get('/works/:dateStart/:dateEnd',
     WorksController.index
   )
 
@@ -34,6 +34,10 @@ module.exports = (app) => {
 
   app.put('/works/:workId',
     WorksController.put
+  )
+
+  app.delete('/works/:workId',
+    WorksController.show
   )
 
   app.post('/works',

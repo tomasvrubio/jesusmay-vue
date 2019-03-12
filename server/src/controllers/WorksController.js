@@ -14,9 +14,13 @@ module.exports = {
       //   // console.log(works)
       //   res.send(JSON.stringify(works))
       // })
+
       //TODO: Me tienen que llamar con dos fechas, la de inicio de búsqueda y la de final. 
-      const dayStart = moment(new Date(req.params.dateStart)).format('YYYYMMDD')
-      const dayEnd = moment(new Date(req.params.dateEnd)).format('YYYYMMDD')
+      // Las fechas vienen en formato epoch
+      const dayStart = moment(Number(req.params.dateStart)).format('YYYYMMDD')
+      const dayEnd = moment(Number(req.params.dateEnd)).format('YYYYMMDD')
+      // console.log(dayStart)
+      // console.log(dayEnd)
       // const dayStart = "20190324"
       // const dayEnd = "20190325"
 
@@ -28,8 +32,8 @@ module.exports = {
         {$group: {_id: null, slts: {$push : "$slots"}}},
         {$project: {_id: 0, slots: "$slts"}}
       ]).then (works => {
-        console.log(works)
-        res.send(JSON.stringify(works[0].slots))
+        // console.log(JSON.stringify(works))
+        res.send(works[0].slots)
       })
 
     } catch (err) {
@@ -51,8 +55,8 @@ module.exports = {
       await Calendar.find({slots: {$elemMatch: {_id:req.params.workId}}}, 
         {_id:0, slots:{$elemMatch: {_id:req.params.workId}}})
         .then (work => {
-          console.log(JSON.stringify(work[0].slots[0]))
-          res.send(JSON.stringify(work[0].slots[0]))
+          // console.log(JSON.stringify(work[0].slots[0]))
+          res.send(work[0].slots[0])
         })
 
 
@@ -167,5 +171,35 @@ module.exports = {
         error: 'Error ocurred trying to update work'
       })
     } 
-  }
+  },
+  async delete (req, res) {
+    try {
+      // TODO: Aquí con Calendar lo que tengo que hacer es un pop de elemento que quiero modificar y un push donde lo quiero situar. Tendré que crear el día igual que con post en caso de que no exista.
+
+      // UTiliza lo mismo que put: El workId y el body con la info de lo que quieres borrar. ¿Eso último lo necesito? Lo tengo para poder filtrar por la fecha
+
+      const day = moment(new Date(req.body.datePicked)).format('YYYYMMDD')
+
+      await Calendar.findOneAndUpdate({day}, 
+        {
+            $pull: {
+                slots: {
+                    _id: req.params.workId
+                }
+            }
+        })
+
+      await Work.updateOne({_id:req.params.workId}, req.body)
+      .then (work => {
+        console.log(work)
+        res.send(req.body)
+      })
+
+    } catch (err) {
+      console.log(err)
+      res.status(500).send({
+        error: 'Error ocurred trying to update work'
+      })
+    } 
+  },
 }
