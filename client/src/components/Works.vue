@@ -37,7 +37,7 @@
               <v-btn
                 class="cyan"
                 dark
-                @click="navigateTo({name:'work', params: {workId:work._id}})">
+                @click="navigateTo({name:'work', params: {datePicked:work.datePicked, workId:work._id}})">
                 View
               </v-btn>
             </v-flex>

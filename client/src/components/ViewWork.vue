@@ -61,7 +61,6 @@
         <v-text-field
           label="Category"
           class="required"
-          disabled
           :rules="[required]"
           v-model="work.category"
         ></v-text-field>
@@ -69,7 +68,6 @@
         <v-textarea
           label="Notes"
           multi-line
-          disabled
           v-model="work.notes"
         ></v-textarea>
       </panel>
@@ -83,6 +81,7 @@
 <script>
 import WorksService from '@/services/WorksService'
 import Panel from '@/components/Panel'
+import moment from 'moment'
 
 export default {
   data () {
@@ -114,18 +113,20 @@ export default {
       // Envia info para guardar
       // Vuelve a estado inicial (deshabilitado y edit habilitado)
 
-      const areAllFieldsFilledIn = Object
-        .keys(this.work)
-        .every(key => !!this.work[key])
-      if (!areAllFieldsFilledIn) {
-        this.error = 'Please fill in all the required fields.'
-        return
-      }
+      // const areAllFieldsFilledIn = Object
+      //   .keys(this.work)
+      //   .every(key => !!this.work[key])
+      // if (!areAllFieldsFilledIn) {
+      //   this.error = 'Please fill in all the required fields.'
+      //   return
+      // }
 
       const workId = this.$store.state.route.params.workId
-      this.work.name = 'Jaime'
+      const day = moment(this.$store.state.route.params.datePicked).format('YYYYMMDD')
+      this.work.name = 'Jaime' // TODO: Quitar
+
       try {
-        await WorksService.put(this.work)
+        await WorksService.put(day, this.work)
         this.$router.push({
           name: 'work',
           params: {
@@ -154,8 +155,11 @@ export default {
     }
   },
   async mounted () {
+    const day = moment(this.$store.state.route.params.datePicked).format('YYYYMMDD')
     const workId = this.$store.state.route.params.workId
-    this.work = (await WorksService.show(workId)).data
+    this.work = (await WorksService.show(day, workId)).data
+
+    console.log(this.work)
   },
   components: {
     Panel

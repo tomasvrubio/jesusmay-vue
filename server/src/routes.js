@@ -24,20 +24,20 @@ module.exports = (app) => {
     AuthenticationController.changePass
   )
 
+  app.get('/works/detail/:day/:workId',
+    WorksController.show
+  )
+
   app.get('/works/:dateStart/:dateEnd',
     WorksController.index
   )
 
-  app.get('/works/:workId',
-    WorksController.show
-  )
-
-  app.put('/works/:workId',
+  app.put('/works/:day/:workId',
     WorksController.put
   )
 
-  app.delete('/works/:workId',
-    WorksController.show
+  app.delete('/works/:day/:workId',
+    WorksController.delete
   )
 
   app.post('/works',

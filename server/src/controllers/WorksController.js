@@ -4,27 +4,13 @@ const {Work, Calendar} = require('../models/index.js'),
 
 
 module.exports = {
+  // LISTADO RESERVAS
   async index (req, res) {
     try {
-      //TODO: Pasar a buscar en Calendar. ¿Cuantos registros quiero que busque?
-
-      //TODO: Quitar
-      // await Work.find({})
-      // .then (works => {
-      //   // console.log(works)
-      //   res.send(JSON.stringify(works))
-      // })
-
-      //TODO: Me tienen que llamar con dos fechas, la de inicio de búsqueda y la de final. 
-      // Las fechas vienen en formato epoch
+      // Las fechas inicio/fin vienen en formato epoch [date.valueOf()]
       const dayStart = moment(Number(req.params.dateStart)).format('YYYYMMDD')
       const dayEnd = moment(Number(req.params.dateEnd)).format('YYYYMMDD')
-      // console.log(dayStart)
-      // console.log(dayEnd)
-      // const dayStart = "20190324"
-      // const dayEnd = "20190325"
 
-      //TODO: Ya está replicado igual que works. Sólo me faltaría poder hacer un filtrado para no sacar todo lo que hay en la BBDD. ¿Cómo?
       await Calendar.aggregate([
         {$match: {"day": {$gte: dayStart, $lt: dayEnd}}},
         {$unwind: "$slots"},
@@ -43,29 +29,18 @@ module.exports = {
       })
     } 
   },
+  // DETALLE RESERVA
   async show (req, res) {
     try {
-      //TODO: Pasar a utilizar Calendar para extraer estos trabajos. Tendré que descomponer la fecha o bien buscar el objectId entre los objetos SLOT. Debería poder buscar por las dos opciones. ¿Realmente necesito buscar por fecha?
+      const day = req.params.day
+      const workId = req.params.workId
 
-      // db.getCollection('calendars')
-        // .find({day:'20190324'},
-        // {_id:0, slots: {$elemMatch: {hour:'2000'}}})
-
-      //Con objectId y calendar //TODO: Descomentar
-      await Calendar.find({slots: {$elemMatch: {_id:req.params.workId}}}, 
-        {_id:0, slots:{$elemMatch: {_id:req.params.workId}}})
+      await Calendar.find({day, slots: {$elemMatch: {_id:workId}}}, 
+        {_id:0, slots:{$elemMatch: {_id:workId}}})
         .then (work => {
           // console.log(JSON.stringify(work[0].slots[0]))
           res.send(work[0].slots[0])
         })
-
-
-      //TODO: Quitar cuando todo esté pasado a Calendar
-      // await Work.findById(req.params.workId).select('-__v')
-      //   .then (work => {
-      //     console.log(work)
-      //     res.send(JSON.stringify(work))
-      //   })
 
     } catch (err) {
       console.log(err);
@@ -74,34 +49,9 @@ module.exports = {
       })
     } 
   },
+  // CREAR RESERVA
   async post (req, res) {
-    try {
-
-      //Para encontrar si hay una reserva hecha a esa hora. Si me devuelve algo es que existe una reserva.
-      //¿Devuelve lo mismo si no hay documento que si no hay hora?
-      // db.calendars
-      // .find({day:"20190503", slots: {$elemMatch: {hour: "1430"}}})
-
-            // await Calendar.find({day:day, slots: {$elemMatch: {hour: hour}}})
-      //   .then ( work => {
-      //     console.log(work)
-      //     res.send(JSON.stringify(work))
-      //   })
-
-      //Para guardar un registro (pero en robomongo me genera infinitos registros repetidos, tengo que ver si me lo hace en mongoose con el unique que he puesto a "hour")
-      // db.calendars
-      //   .findOneAndUpdate({day:"20190503"}, 
-      //   {$push: {
-      //       slots: {"hour":"1400", "name":"Pedro"}
-      //   }}) 
-
-      //Quitar una reserva
-      // db.calendars
-      //   .findOneAndUpdate({day:"20190503"}, 
-      //   {$pull: {
-      //       slots: {"hour":"1400"}
-      //   }})
- 
+    try { 
       const day = moment(new Date(req.body.datePicked)).format('YYYYMMDD')
       const hour = moment(new Date(req.body.datePicked)).format('HHmm')
 
@@ -155,9 +105,19 @@ module.exports = {
       })
     } 
   },
+  // MODIFICAR RESERVA
   async put (req, res) {
     try {
       // TODO: Aquí con Calendar lo que tengo que hacer es un pop de elemento que quiero modificar y un push donde lo quiero situar. Tendré que crear el día igual que con post en caso de que no exista.
+      const day = req.params.day
+      const workId = req.params.workId
+
+      console.log(req.body)
+
+      //Primero hago el push. Si ha ido bien hago el pull. Si ha ido mal devuelvo error
+
+      
+
 
       await Work.updateOne({_id:req.params.workId}, req.body)
       .then (work => {
@@ -172,33 +132,29 @@ module.exports = {
       })
     } 
   },
+  // ELIMINAR RESERVA
   async delete (req, res) {
     try {
-      // TODO: Aquí con Calendar lo que tengo que hacer es un pop de elemento que quiero modificar y un push donde lo quiero situar. Tendré que crear el día igual que con post en caso de que no exista.
+      const day = req.params.day
+      const workId = req.params.workId
 
-      // UTiliza lo mismo que put: El workId y el body con la info de lo que quieres borrar. ¿Eso último lo necesito? Lo tengo para poder filtrar por la fecha
-
-      const day = moment(new Date(req.body.datePicked)).format('YYYYMMDD')
-
-      await Calendar.findOneAndUpdate({day}, 
+      await Calendar.findOneAndUpdate({ day }, 
         {
-            $pull: {
-                slots: {
-                    _id: req.params.workId
-                }
-            }
+          $pull: {
+              slots: {
+                  _id: workId
+              }
+          }
         })
-
-      await Work.updateOne({_id:req.params.workId}, req.body)
-      .then (work => {
-        console.log(work)
-        res.send(req.body)
+      .then(deleted => {
+        console.log(deleted)
+        res.send(deleted)
       })
 
     } catch (err) {
       console.log(err)
       res.status(500).send({
-        error: 'Error ocurred trying to update work'
+        error: `Error ocurred deleting work with _id ${req.params.workId}`
       })
     } 
   },

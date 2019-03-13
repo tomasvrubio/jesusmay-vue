@@ -32,7 +32,7 @@ export default new Router({
       component: Works
     },
     {
-      path: '/works/:workId',
+      path: '/works/:datePicked/:workId',
       name: 'work',
       component: ViewWork
     },
