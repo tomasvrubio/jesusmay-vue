@@ -108,21 +108,24 @@ module.exports = {
   // MODIFICAR RESERVA
   async put (req, res) {
     try {
-      // TODO: Aquí con Calendar lo que tengo que hacer es un pop de elemento que quiero modificar y un push donde lo quiero situar. Tendré que crear el día igual que con post en caso de que no exista.
       const day = req.params.day
       const workId = req.params.workId
+      const work = req.body
 
-      console.log(req.body)
-
-      //Primero hago el push. Si ha ido bien hago el pull. Si ha ido mal devuelvo error
-
-      
-
-
-      await Work.updateOne({_id:req.params.workId}, req.body)
-      .then (work => {
-        console.log(work)
-        res.send(req.body)
+      await Calendar.updateOne(
+        {
+          day,
+          "slots._id" : workId
+        },
+        {
+          "$set" :
+          {
+            "slots.$" : work
+          }
+        }
+      ).then(workUpdated => {
+        console.log(workUpdated)
+        return res.send('OK')
       })
 
     } catch (err) {

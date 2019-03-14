@@ -37,7 +37,6 @@
         <v-text-field
           label="Date Picked"
           class="required"
-          disabled
           :rules="[required]"
           v-model="work.datePicked"
         ></v-text-field>
@@ -87,6 +86,7 @@ export default {
   data () {
     return {
       work: {},
+      originalDate: null,
       required: (value) => !!value || 'Required.', // TODO: Cambiar con vuelidate
       error: null
     }
@@ -121,21 +121,68 @@ export default {
       //   return
       // }
 
+      console.log(this.originalDate)
       const workId = this.$store.state.route.params.workId
-      const day = moment(this.$store.state.route.params.datePicked).format('YYYYMMDD')
-      this.work.name = 'Jaime' // TODO: Quitar
+      const newDate = new Date(this.work.datePicked).valueOf()
+      const day = moment(Number(newDate)).format('YYYYMMDD')
 
-      try {
-        await WorksService.put(day, this.work)
-        this.$router.push({
-          name: 'work',
-          params: {
-            workId
-          }
-        })
-      } catch (err) {
-        console.log(err)
+      if (this.originalDate === newDate) {
+        console.log('No ha cambiado la fecha')
+        const day = moment(Number(newDate)).format('YYYYMMDD')
+        try {
+          await WorksService.put(day, this.work)
+          this.$router.push({
+            name: 'work',
+            params: {
+              datePicked: newDate,
+              workId
+            }
+          })
+        } catch (err) {
+          console.log(err)
+        }
+      } else {
+        console.log('La fecha ha cambiado')
+        // Aquí lo que tengo que hacer es crear la nueva reserva (quitando el _id del objeto). Si la he podido crear tengo que borrar la actual.
+        console.log(this.work)
+        const oldDay = moment(Number(this.originalDate)).format('YYYYMMDD')
+        const newWork = {
+          name: this.work.name,
+          email: this.work.email,
+          phone: this.work.phone,
+          datePicked: new Date(this.work.datePicked),
+          category: this.work.category,
+          notes: this.work.notes,
+          state: this.work.state
+        }
+        console.log(newWork)
+        try {
+          await WorksService.post(newWork)
+          await WorksService.delete(oldDay, workId)
+          // Si ha ido bien aquí tengo que borrar el trabajo original
+          this.$router.push({
+            name: 'works'
+          })
+        } catch (err) {
+          console.log(err)
+        }
       }
+
+      // const workId = this.$store.state.route.params.workId
+      // const day = moment(this.$store.state.route.params.datePicked).format('YYYYMMDD')
+      // this.work.name = 'Jaime' // TODO: Quitar
+
+      // try {
+      //   await WorksService.put(day, this.work)
+      //   this.$router.push({
+      //     name: 'work',
+      //     params: {
+      //       workId
+      //     }
+      //   })
+      // } catch (err) {
+      //   console.log(err)
+      // }
     },
     async remove () {
       console.log('Removing')
@@ -158,8 +205,9 @@ export default {
     const day = moment(this.$store.state.route.params.datePicked).format('YYYYMMDD')
     const workId = this.$store.state.route.params.workId
     this.work = (await WorksService.show(day, workId)).data
+    this.originalDate = this.$store.state.route.params.datePicked
 
-    console.log(this.work)
+    // console.log(originalDate)
   },
   components: {
     Panel
