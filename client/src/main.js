@@ -7,10 +7,14 @@ import Vuetify from 'vuetify'
 import { sync } from 'vuex-router-sync'
 import 'vuetify/dist/vuetify.min.css'
 import store from '@/store/store'
+// import Vuelidate from 'vuelidate' // TODO: QUITAR
+import VeeValidate from 'vee-validate'
 
 Vue.config.productionTip = false
 
 Vue.use(Vuetify)
+// Vue.use(Vuelidate) // TODO: QUITAR
+Vue.use(VeeValidate)
 
 sync(store, router)
 
