@@ -1,93 +1,106 @@
 <template>
-  <v-layout row>
-    <v-flex>
-      <panel title="Work info">
-        <v-btn
-          class="cyan"
-          @click='edit'
-          :disabled=!isDisabled
-          small
-          fab>
-          <v-icon>edit</v-icon>
-        </v-btn>
+  <v-form v-model="valid">
+    <v-layout row>
+      <v-flex>
+        <panel title="Work info">
+          <v-btn
+            class="cyan"
+            @click='edit'
+            :disabled=!isDisabled
+            small
+            fab>
+            <v-icon>edit</v-icon>
+          </v-btn>
 
-        <v-btn
-          class="green"
-          @click='save'
-          :disabled=isDisabled
-          small
-          fab>
-          <v-icon>save</v-icon>
-        </v-btn>
+          <v-btn
+            class="green"
+            @click='save'
+            :disabled=isDisabled
+            small
+            fab>
+            <v-icon>save</v-icon>
+          </v-btn>
 
-        <v-btn
-          class="red"
-          @click='remove'
-          :disabled=!isDisabled
-          small
-          fab>
-          <v-icon>delete</v-icon>
-        </v-btn>
+          <v-btn
+            class="red"
+            @click='remove'
+            :disabled=!isDisabled
+            small
+            fab>
+            <v-icon>delete</v-icon>
+          </v-btn>
 
-        <v-text-field
-          name="work-name"
-          label="Name"
-          class="required"
-          :rules="[required]"
-          :disabled=isDisabled
-          v-model="work.name"
-        ></v-text-field>
+          <v-text-field
+            v-model="work.name"
+            v-validate="'required'"
+            :error-messages="errors.collect('name')"
+            :disabled=isDisabled
+            label="Name"
+            data-vv-name="name"
+            class="required"
+            required
+          ></v-text-field>
 
-        <v-text-field
-          name="work-datePicked"
-          label="Date Picked"
-          class="required"
-          :rules="[required]"
-          :disabled=isDisabled
-          v-model="work.datePicked"
-        ></v-text-field>
+          <v-text-field
+            v-model="work.email"
+            v-validate="'required|email'"
+            :error-messages="errors.collect('email')"
+            :disabled=isDisabled
+            label="Email"
+            data-vv-name="email"
+            class="required"
+            required
+          ></v-text-field>
 
-        <v-text-field
-          name="work-email"
-          label="Email"
-          class="required"
-          :rules="[required]"
-          :disabled=isDisabled
-          v-model="work.email"
-        ></v-text-field>
+          <v-text-field
+            v-model="work.datePicked"
+            v-validate="'required'"
+            :error-messages="errors.collect('datePicked')"
+            :disabled=isDisabled
+            label="Date Picked"
+            data-vv-name="datePicked"
+            class="required"
+            required
+          ></v-text-field>
 
-        <v-text-field
-          name="work-phone"
-          label="Phone"
-          class="required"
-          :rules="[required]"
-          :disabled=isDisabled
-          v-model="work.phone"
-        ></v-text-field>
+          <v-text-field
+            v-model="work.phone"
+            v-validate="'required'"
+            :error-messages="errors.collect('phone')"
+            :disabled=isDisabled
+            label="Phone"
+            data-vv-name="phone"
+            class="required"
+            required
+          ></v-text-field>
 
-        <v-text-field
-          name="work-category"
-          label="Category"
-          class="required"
-          :rules="[required]"
-          :disabled=isDisabled
-          v-model="work.category"
-        ></v-text-field>
+          <v-text-field
+            v-model="work.category"
+            v-validate="'required'"
+            :error-messages="errors.collect('category')"
+            :disabled=isDisabled
+            label="Category"
+            data-vv-name="category"
+            class="required"
+            required
+          ></v-text-field>
 
-        <v-textarea
-          name="work-notes"
-          label="Notes"
-          multi-line
-          :disabled=isDisabled
-          :required=true
-          v-model="work.notes"
-        ></v-textarea>
-      </panel>
-      <div class="danger-alert" v-if="error">
-        {{error}}
-      </div>
-    </v-flex>
-  </v-layout>
+          <v-textarea
+            v-model="work.notes"
+            :disabled=isDisabled
+            label="Notes"
+            data-vv-name="notes"
+            multi-line
+          ></v-textarea>
+        </panel>
+
+        <div class="danger-alert" v-if="error">
+          {{error}}
+        </div>
+
+      </v-flex>
+    </v-layout>
+  </v-form>
 </template>
 
 <script>
@@ -114,6 +127,8 @@ export default {
   methods: {
     async edit () {
       this.isDisabled = false
+      var resultValidation = await this.$validator.validateAll()
+      console.log(resultValidation)
     },
     async save () {
       // Deshabilitado por defecto
@@ -122,16 +137,16 @@ export default {
 
       console.log(this.required(this.work.notes))
       console.log(Object.keys(this.work))
-      const areAllFieldsFilledIn = Object
-        .keys(this.work)
-        .every(key => {
-          console.log(key)
-          !!this.work[key]
-        })
-      if (!areAllFieldsFilledIn) {
-        this.error = 'Please fill in all the required fields.'
-        return
-      }
+      // const areAllFieldsFilledIn = Object
+      //   .keys(this.work)
+      //   .every(key => {
+      //     console.log(key)
+      //     !!this.work[key]
+      //   })
+      // if (!areAllFieldsFilledIn) {
+      //   this.error = 'Please fill in all the required fields.'
+      //   return
+      // }
       const workId = this.$store.state.route.params.workId
       const newDate = new Date(this.work.datePicked).valueOf()
 

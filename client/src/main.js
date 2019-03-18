@@ -7,14 +7,19 @@ import Vuetify from 'vuetify'
 import { sync } from 'vuex-router-sync'
 import 'vuetify/dist/vuetify.min.css'
 import store from '@/store/store'
-// import Vuelidate from 'vuelidate' // TODO: QUITAR
 import VeeValidate from 'vee-validate'
+import VueValidationEs from 'vee-validate/dist/locale/es'
 
 Vue.config.productionTip = false
 
+// For validating forms. Configured in spanish.
 Vue.use(Vuetify)
-// Vue.use(Vuelidate) // TODO: QUITAR
-Vue.use(VeeValidate)
+Vue.use(VeeValidate, {
+  locale: 'es',
+  dictionary: {
+    es: VueValidationEs
+  }
+})
 
 sync(store, router)
 
