@@ -49,13 +49,13 @@
 </template>
 
 <script>
-import Panel from '@/components/Panel'
+// import Panel from '@/components/Panel'
 import WorksService from '@/services/WorksService'
 
 export default {
-  components: {
-    Panel
-  },
+  // components: {
+  //   Panel
+  // },
   data () {
     return {
       works: null

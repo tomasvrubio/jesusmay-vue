@@ -54,7 +54,7 @@
 
           <v-text-field
             v-model="work.datePicked"
-            v-validate="'required'"
+            v-validate="'required|date_format:dd/MM/yyyy HH:mm'"
             :error-messages="errors.collect('datePicked')"
             :disabled=isDisabled
             label="Date Picked"
@@ -105,9 +105,8 @@
 
 <script>
 import WorksService from '@/services/WorksService'
-import Panel from '@/components/Panel'
+// import Panel from '@/components/Panel'
 import moment from 'moment'
-// import { required, minLength, between } from 'vuelidate/lib/validators'
 
 export default {
   data () {
@@ -119,34 +118,17 @@ export default {
       isDisabled: true
     }
   },
-  // validations: {
-  //   work.notes: {
-  //     required
-  //   }
-  // },
   methods: {
     async edit () {
       this.isDisabled = false
-      var resultValidation = await this.$validator.validateAll()
-      console.log(resultValidation)
     },
     async save () {
-      // Deshabilitado por defecto
-      // Envia info para guardar
-      // Vuelve a estado inicial (deshabilitado y edit habilitado) o vuelve a listado de trabajos??
+      var resultValidation = await this.$validator.validateAll()
+      if (!resultValidation) {
+        this.error = 'Please fill in all the required fields.'
+        return
+      }
 
-      console.log(this.required(this.work.notes))
-      console.log(Object.keys(this.work))
-      // const areAllFieldsFilledIn = Object
-      //   .keys(this.work)
-      //   .every(key => {
-      //     console.log(key)
-      //     !!this.work[key]
-      //   })
-      // if (!areAllFieldsFilledIn) {
-      //   this.error = 'Please fill in all the required fields.'
-      //   return
-      // }
       const workId = this.$store.state.route.params.workId
       const newDate = new Date(this.work.datePicked).valueOf()
 
@@ -213,11 +195,13 @@ export default {
     const day = moment(this.$store.state.route.params.datePicked).format('YYYYMMDD')
     const workId = this.$store.state.route.params.workId
     this.work = (await WorksService.show(day, workId)).data
+    this.work.datePicked = moment(this.work.datePicked).format('DD/MM/YYYY HH:mm')
     this.originalDate = this.$store.state.route.params.datePicked
-  },
-  components: {
-    Panel
   }
+  // },
+  // components: {
+  //   Panel
+  // }
 }
 </script>
 

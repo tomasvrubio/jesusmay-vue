@@ -9,6 +9,7 @@ import 'vuetify/dist/vuetify.min.css'
 import store from '@/store/store'
 import VeeValidate from 'vee-validate'
 import VueValidationEs from 'vee-validate/dist/locale/es'
+import Panel from '@/components/global/Panel'
 
 Vue.config.productionTip = false
 
@@ -20,6 +21,8 @@ Vue.use(VeeValidate, {
     es: VueValidationEs
   }
 })
+
+Vue.component('panel', Panel)
 
 sync(store, router)
 

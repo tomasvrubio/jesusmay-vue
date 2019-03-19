@@ -33,7 +33,7 @@
 
 <script>
 import AuthenticationService from '@/services/AuthenticationService'
-import Panel from '@/components/Panel'
+// import Panel from '@/components/Panel'
 
 export default {
   name: 'Register',
@@ -67,10 +67,11 @@ export default {
         this.error = error.response.data.error
       }
     }
-  },
-  components: {
-    Panel
   }
+  // },
+  // components: {
+  //   Panel
+  // }
 }
 </script>
 

@@ -23,7 +23,6 @@
             required
           ></v-text-field>
 
-          <!-- TODO: Poner validaciones de lo que falta (tlf, fecha...) -->
           <v-text-field
             v-model="work.phone"
             v-validate="'required'"
@@ -37,7 +36,7 @@
           <!-- TODO: Aquí tengo que poner un datePicker -->
           <v-text-field
             v-model="work.datePicked"
-            v-validate="'required'"
+            v-validate="'required|date_format:dd/MM/yyyy HH:mm'"
             :error-messages="errors.collect('datePicked')"
             label="Date Picked"
             data-vv-name="datePicked"
@@ -83,7 +82,7 @@
 </template>
 
 <script>
-import Panel from '@/components/Panel'
+// import Panel from '@/components/Panel'
 import WorksService from '@/services/WorksService'
 
 export default {
@@ -119,10 +118,11 @@ export default {
         console.log(err)
       }
     }
-  },
-  components: {
-    Panel
   }
+  // },
+  // components: {
+  //   Panel
+  // }
 }
 </script>
 
