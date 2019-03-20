@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import Register from '@/components/Register'
 import Login from '@/components/Login'
-import Works from '@/components/Works'
+import Works from '@/components/Works/Index'
 import CreateWork from '@/components/CreateWork'
 import ViewWork from '@/components/ViewWork'
 

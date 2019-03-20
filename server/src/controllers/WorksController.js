@@ -10,18 +10,38 @@ module.exports = {
       // Las fechas inicio/fin vienen en formato epoch [date.valueOf()]
       const dayStart = moment(Number(req.params.dateStart)).format('YYYYMMDD')
       const dayEnd = moment(Number(req.params.dateEnd)).format('YYYYMMDD')
+      const search = req.params.search
 
-      await Calendar.aggregate([
-        {$match: {"day": {$gte: dayStart, $lt: dayEnd}}},
-        {$unwind: "$slots"},
-        {$sort: {"slots.datePicked": 1}},
-        {$group: {_id: null, slts: {$push : "$slots"}}},
-        {$project: {_id: 0, slots: "$slts"}}
-      ]).then (works => {
-        // console.log(JSON.stringify(works))
-        res.send(works[0].slots)
-      })
-
+      if (search !== "undefined") {
+        await Calendar.aggregate([
+          {$match: {"day": {$gte: dayStart, $lt: dayEnd}}},
+          {$unwind: "$slots"},
+          {$sort: {"slots.datePicked": 1}},
+          {$group: {_id: null, slts: {$push : "$slots"}}},
+          {$project: {_id: 0, slots: "$slts"}},
+          {$unwind:"$slots"},
+          {$replaceRoot: { newRoot: "$slots" }},
+          {$match: {$or: [
+            {"name": {$regex: search, $options: 'i'}}, 
+            {"email": {$regex: search, $options: 'i'}}, 
+            {"phone": {$regex: search}}
+          ]}}
+        ]).then (works => {
+          res.send(works)
+        })
+      } else { 
+        await Calendar.aggregate([
+          {$match: {"day": {$gte: dayStart, $lt: dayEnd}}},
+          {$unwind: "$slots"},
+          {$sort: {"slots.datePicked": 1}},
+          {$group: {_id: null, slts: {$push : "$slots"}}},
+          {$project: {_id: 0, slots: "$slts"}},
+          {$unwind:"$slots"},
+          {$replaceRoot: { newRoot: "$slots" }}
+        ]).then (works => {
+          res.send(works)
+        })
+      }
     } catch (err) {
       console.log(err);
       res.status(500).send({

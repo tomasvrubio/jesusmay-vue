@@ -28,7 +28,7 @@ module.exports = (app) => {
     WorksController.show
   )
 
-  app.get('/works/:dateStart/:dateEnd',
+  app.get('/works/:dateStart/:dateEnd/:search',
     WorksController.index
   )
 

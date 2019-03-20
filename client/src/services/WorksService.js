@@ -1,8 +1,15 @@
 import Api from '@/services/Api'
 
 export default {
-  index (dateStart, dateEnd) {
-    return Api().get(`works/${dateStart}/${dateEnd}`)
+  index (dateStart, dateEnd, value) {
+    return Api().get(`works/${dateStart}/${dateEnd}/${value}`)
+  },
+  index2 (search) {
+    return Api().get('works', {
+      params: {
+        search: search
+      }
+    })
   },
   show (day, workId) {
     return Api().get(`works/detail/${day}/${workId}`)
