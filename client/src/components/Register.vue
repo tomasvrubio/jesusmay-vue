@@ -2,9 +2,15 @@
   <v-layout row>
     <v-flex xs6 offset-xs3>
       <panel title="Register">
+        <!-- TODO: En este formulario tengo que meter el resto de elementos necesarios para un usuario. ¿nombre y algo más? -->
         <form
           name="jesusmay-form"
           autocomplete="off">
+          <v-text-field
+            label="Name"
+            v-model="name"
+          ></v-text-field>
+          <br>
           <v-text-field
             label="Email"
             v-model="email"
@@ -18,7 +24,7 @@
           ></v-text-field>
         </form>
         <br>
-        <div class="error" v-html="error" />
+        <div class="danger-alert" v-html="error" />
         <br>
         <v-btn
           class="cyan"
@@ -39,6 +45,7 @@ export default {
   name: 'Register',
   data () {
     return {
+      name: '',
       email: '',
       password: '',
       error: null
@@ -58,11 +65,15 @@ export default {
     async register () {
       try {
         const response = await AuthenticationService.register({
+          name: this.name,
           email: this.email,
           password: this.password
         })
         this.$store.dispatch('setToken', response.data.token)
         this.$store.dispatch('setUser', response.data.user)
+        this.$router.push({
+          name: 'works'
+        })
       } catch (error) {
         this.error = error.response.data.error
       }
@@ -76,7 +87,5 @@ export default {
 </script>
 
 <style scoped>
-.error {
-  color: red;
-}
+
 </style>

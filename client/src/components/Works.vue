@@ -4,7 +4,9 @@
       <panel title="Works">
         <v-btn
           slot="action"
-          @click="navigateTo({name: 'works-create'})"
+          :to="{
+            name: 'works-create'
+          }"
           class="white"
           light
           small
@@ -37,7 +39,13 @@
               <v-btn
                 class="cyan"
                 dark
-                @click="navigateTo({name:'work', params: {datePicked:new Date(work.datePicked).valueOf(), workId:work._id}})">
+                :to="{
+                  name:'work',
+                  params: {
+                    datePicked: new Date(work.datePicked).valueOf(),
+                    workId:work._id
+                  }
+                }">
                 View
               </v-btn>
             </v-flex>
@@ -62,9 +70,9 @@ export default {
     }
   },
   methods: {
-    navigateTo (route) {
-      this.$router.push(route)
-    }
+    // navigateTo (route) {
+    //   this.$router.push(route)
+    // }
   },
   async mounted () {
     // Request for all the works

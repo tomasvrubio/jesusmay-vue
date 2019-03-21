@@ -40,6 +40,10 @@ export default new Router({
       path: '/works/create',
       name: 'works-create',
       component: CreateWork
+    },
+    {
+      path: '*',
+      redirect: '/'
     }
   ]
 })
