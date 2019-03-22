@@ -192,7 +192,7 @@ export default {
     }
   },
   async mounted () {
-    const day = moment(this.$store.state.route.params.datePicked).format('YYYYMMDD')
+    const day = moment(parseInt(this.$store.state.route.params.datePicked)).format('YYYYMMDD')
     const workId = this.$store.state.route.params.workId
     this.work = (await WorksService.show(day, workId)).data
     this.work.datePicked = moment(this.work.datePicked).format('DD/MM/YYYY HH:mm')

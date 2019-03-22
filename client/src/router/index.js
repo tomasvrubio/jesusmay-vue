@@ -6,6 +6,7 @@ import Login from '@/components/Login'
 import Works from '@/components/Works/Index'
 import CreateWork from '@/components/CreateWork'
 import ViewWork from '@/components/ViewWork'
+import Calendar from '@/components/Calendar'
 
 Vue.use(Router)
 
@@ -40,6 +41,11 @@ export default new Router({
       path: '/works/create',
       name: 'works-create',
       component: CreateWork
+    },
+    {
+      path: '/calendar',
+      name: 'calendar',
+      component: Calendar
     },
     {
       path: '*',
