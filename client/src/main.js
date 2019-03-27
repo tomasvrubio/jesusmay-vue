@@ -10,11 +10,17 @@ import store from '@/store/store'
 import VeeValidate from 'vee-validate'
 import VueValidationEs from 'vee-validate/dist/locale/es'
 import Panel from '@/components/global/Panel'
+// import VueCal from 'vue-cal'
+// import 'vue-cal/dist/vuecal.css'
 
 Vue.config.productionTip = false
 
 // For validating forms. Configured in spanish.
-Vue.use(Vuetify)
+Vue.use(Vuetify, {
+  lang: {
+    current: 'es'
+  }
+})
 Vue.use(VeeValidate, {
   locale: 'es',
   dictionary: {
@@ -23,6 +29,7 @@ Vue.use(VeeValidate, {
 })
 
 Vue.component('panel', Panel)
+// Vue.component('vue-cal', VueCal)
 
 sync(store, router)
 
