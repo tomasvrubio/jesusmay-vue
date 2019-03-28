@@ -6,7 +6,7 @@
       <v-btn
         class="cyan"
         dark
-        @click="$refs.calendar.prev()">
+        @click="changePrev()">
         <v-icon
           dark
           left>
@@ -22,7 +22,7 @@
       <v-btn
         class="cyan"
         dark
-        @click="$refs.calendar.next()">
+        @click="changeNext()">
         Next
         <v-icon
           right
@@ -40,8 +40,10 @@
         <v-calendar
           ref="calendar"
           locale="es"
+          v-model="today"
           :now="today"
-          :value="today"
+          :start="start"
+          :end="end"
           color="primary"
           type="week"
           :weekdays="weekdays"
@@ -52,6 +54,7 @@
           :interval-style="intervalStyle">
           <!-- the events at the top (all-day) -->
           <template v-slot:dayHeadere="{ date }">
+            <div @click="console.log(clicked)">
             <template v-for="event in eventsMap[date]">
               <!-- all day events don't have time -->
               <div
@@ -61,6 +64,7 @@
                 @click="open(event)"
                 v-html="event.title" />
             </template>
+            </div>
           </template>
           <!-- the events at the bottom (timed) -->
           <template v-slot:dayBody="{ date, timeToY, minutesToPixels }">
@@ -78,11 +82,14 @@
         </v-calendar>
       </v-sheet>
     </v-flex>
+    <!-- TODO: Estoy pendiente el que arreglen cuando pulso un día de una semana diferente a la que empecé no se vaya todo al carajo. -->
 
   </v-layout>
 </template>
 
 <script>
+import moment from 'moment'
+
 const stylings = {
   default (interval) {
     return undefined
@@ -110,7 +117,10 @@ export default {
     minWeeks: 1,
     maxDays: 6,
     weekdays: [1, 2, 3, 4, 5, 6, 0],
-    today: '2019-01-08',
+    // today: moment().format('YYYY-MM-DD'),
+    today: '2019-01-10',
+    start: moment(this.today).day(1).format('YYYY-MM-DD'),
+    end: moment(this.today).day(0).format('YYYY-MM-DD'),
     intervals: { first: 15, minutes: 30, count: 26, height: 40 },
     styleInterval: 'workday',
     events: [
@@ -147,11 +157,24 @@ export default {
     }
   },
   mounted () {
-    this.$refs.calendar.scrollToTime('08:00')
+    // this.$refs.calendar.scrollToTime('08:00')
   },
   methods: {
     open (event) {
       alert(event.title)
+      console.log(this.today)
+      console.log(this.start)
+      console.log(this.end)
+    },
+    changePrev () {
+      this.$refs.calendar.prev()
+      this.start = moment(this.today).day(1).format('YYYY-MM-DD')
+      this.end = moment(this.today).day(0).format('YYYY-MM-DD')
+    },
+    changeNext () {
+      this.$refs.calendar.next()
+      this.start = moment(this.today).day(1).format('YYYY-MM-DD')
+      this.end = moment(this.today).day(0).format('YYYY-MM-DD')
     }
   }
 }
