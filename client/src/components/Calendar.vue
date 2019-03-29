@@ -54,7 +54,7 @@
           :interval-style="intervalStyle">
           <!-- the events at the top (all-day) -->
           <template v-slot:dayHeadere="{ date }">
-            <div @click="console.log(clicked)">
+            <div>
             <template v-for="event in eventsMap[date]">
               <!-- all day events don't have time -->
               <div
@@ -74,7 +74,7 @@
                 v-if="event.time"
                 :key="event.title"
                 :style="{ top: timeToY(event.time) + 'px', height: minutesToPixels(event.duration) + 'px' }"
-                class="my-event with-time"
+                :class="['event', !event.vacation ? 'work' : 'vacation']"
                 @click="open(event)"
                 v-html="event.title" />
             </template>
@@ -158,6 +158,8 @@ export default {
   },
   mounted () {
     // this.$refs.calendar.scrollToTime('08:00')
+    this.start = moment(this.today).day(1).format('YYYY-MM-DD')
+    this.end = moment(this.today).day(0).format('YYYY-MM-DD')
   },
   methods: {
     open (event) {
@@ -181,14 +183,14 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .my-event {
+  .event {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     border-radius: 2px;
-    background-color: #1867c0;
+    background-color: #1985A1;
     color: #ffffff;
-    border: 1px solid #1867c0;
+    border: 1px solid #C5C3C6;
     font-size: 12px;
     padding: 3px;
     cursor: pointer;
@@ -196,16 +198,16 @@ export default {
     left: 4px;
     margin-right: 8px;
     position: relative;
-    &.with-time {
+    &.work {
       position: absolute;
       right: 4px;
       margin-right: 0px;
     }
-    &.with-vacation {
+    &.vacation {
       position: absolute;
       right: 4px;
       margin-right: 0px;
-      background-color: #5867c0;
+      background-color: #C5C3C6;
     }
   }
 </style>

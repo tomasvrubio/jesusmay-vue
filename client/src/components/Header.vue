@@ -16,6 +16,15 @@
         flat
         dark
         :to="{
+          name: 'calendar'
+        }">
+        Calendar
+      </v-btn>
+
+      <v-btn
+        flat
+        dark
+        :to="{
           name: 'works'
         }">
         Browse
