@@ -1,7 +1,7 @@
 <template>
   <v-layout wrap>
     <v-flex
-      xs6
+      xs4
       class="text-center">
       <v-btn
         class="cyan"
@@ -17,7 +17,18 @@
     </v-flex>
 
     <v-flex
-      xs6
+      xs4
+      class="text-center">
+      <v-btn
+        class="cyan"
+        dark
+        @click="viewMonth()">
+        {{ startMonth }}
+      </v-btn>
+    </v-flex>
+
+    <v-flex
+      xs4
       class="text-center">
       <v-btn
         class="cyan"
@@ -51,31 +62,23 @@
           :interval-minutes="intervals.minutes"
           :interval-count="intervals.count"
           :interval-height="intervals.height"
-          :interval-style="intervalStyle">
+          :interval-style="intervalStyle"
+          @click:day="viewDay"
+          @click:date="viewDay"
+          @click:time="freeSlot">
           <!-- the events at the top (all-day) -->
           <template v-slot:dayHeadere="{ date }">
-            <div>
-            <template v-for="event in eventsMap[date]">
-              <!-- all day events don't have time -->
-              <div
-                v-if="event.vacation"
-                :key="event.title"
-                class="my-event with-vacation"
-                @click="open(event)"
-                v-html="event.title" />
-            </template>
-            </div>
+
           </template>
           <!-- the events at the bottom (timed) -->
           <template v-slot:dayBody="{ date, timeToY, minutesToPixels }">
             <template v-for="event in eventsMap[date]">
               <!-- timed events -->
               <div
-                v-if="event.time"
                 :key="event.title"
-                :style="{ top: timeToY(event.time) + 'px', height: minutesToPixels(event.duration) + 'px' }"
+                :style="{ top: timeToY(event.time) + 'px', height: minutesToPixels(event.duration) - 1 + 'px' }"
                 :class="['event', !event.vacation ? 'work' : 'vacation']"
-                @click="open(event)"
+                @click.stop="ocuppiedSlot(event)"
                 v-html="event.title" />
             </template>
           </template>
@@ -89,6 +92,8 @@
 
 <script>
 import moment from 'moment'
+
+moment.locale('es')
 
 const stylings = {
   default (interval) {
@@ -128,7 +133,19 @@ export default {
         title: 'Weekly Meeting',
         date: '2019-01-07',
         time: '09:00',
-        duration: 45
+        duration: 30
+      },
+      {
+        title: 'Weekly Meeting2',
+        date: '2019-01-07',
+        time: '09:30',
+        duration: 30
+      },
+      {
+        title: 'Weekly Meeting3',
+        date: '2019-01-08',
+        time: '09:30',
+        duration: 30
       },
       {
         title: 'Thomas\' Birthday',
@@ -141,7 +158,7 @@ export default {
         title: 'Mash Potatoes',
         date: '2019-01-09',
         time: '12:30',
-        duration: 180
+        duration: 30
       }
     ]
   }),
@@ -154,6 +171,9 @@ export default {
       const map = {}
       this.events.forEach(e => (map[e.date] = map[e.date] || []).push(e))
       return map
+    },
+    startMonth () {
+      return moment(this.start).format('MMMM')
     }
   },
   mounted () {
@@ -162,21 +182,31 @@ export default {
     this.end = moment(this.today).day(0).format('YYYY-MM-DD')
   },
   methods: {
-    open (event) {
-      alert(event.title)
-      console.log(this.today)
-      console.log(this.start)
-      console.log(this.end)
-    },
     changePrev () {
       this.$refs.calendar.prev()
       this.start = moment(this.today).day(1).format('YYYY-MM-DD')
       this.end = moment(this.today).day(0).format('YYYY-MM-DD')
+      console.log(this.today)
     },
     changeNext () {
       this.$refs.calendar.next()
       this.start = moment(this.today).day(1).format('YYYY-MM-DD')
       this.end = moment(this.today).day(0).format('YYYY-MM-DD')
+    },
+    ocuppiedSlot (event) {
+      alert(event.title)
+      console.log(this.today)
+      console.log(this.start)
+      console.log(this.end)
+    },
+    freeSlot (event) {
+      console.log(event.date, event.hour, event.minute < 30 ? 0 : 30)
+    },
+    viewDay (event) {
+      console.log(event.date)
+    },
+    viewMonth (event) {
+      console.log(this.start)
     }
   }
 }
@@ -195,17 +225,17 @@ export default {
     padding: 3px;
     cursor: pointer;
     margin-bottom: 1px;
-    left: 4px;
-    margin-right: 8px;
+    left: 1px;
+    margin-right: 2px;
     position: relative;
     &.work {
       position: absolute;
-      right: 4px;
+      right: 1px;
       margin-right: 0px;
     }
     &.vacation {
       position: absolute;
-      right: 4px;
+      right: 1px;
       margin-right: 0px;
       background-color: #C5C3C6;
     }
