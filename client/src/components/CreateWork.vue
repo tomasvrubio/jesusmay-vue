@@ -36,7 +36,7 @@
           <!-- TODO: Aquí tengo que poner un datePicker -->
           <v-text-field
             v-model="work.datePicked"
-            v-validate="'required|date_format:dd/MM/yyyy HH:mm'"
+            v-validate="'required|date_format:yyyy/MM/dd HH:mm'"
             :error-messages="errors.collect('datePicked')"
             label="Date Picked"
             data-vv-name="datePicked"
@@ -110,6 +110,7 @@ export default {
 
       try {
         this.work.datePicked = new Date(this.work.datePicked)
+        console.log(this.work.datePicked)
         await WorksService.post(this.work)
         this.$router.push({
           name: 'works'

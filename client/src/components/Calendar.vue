@@ -4,7 +4,7 @@
       xs4
       class="text-center">
       <v-btn
-        class="cyan"
+        class="cyan font-weight-black"
         dark
         @click="changePrev()">
         <v-icon
@@ -20,7 +20,7 @@
       xs4
       class="text-center">
       <v-btn
-        class="cyan"
+        class="cyan font-weight-black"
         dark
         @click="viewMonth()">
         {{ startMonth }}
@@ -31,7 +31,7 @@
       xs4
       class="text-center">
       <v-btn
-        class="cyan"
+        class="cyan font-weight-black"
         dark
         @click="changeNext()">
         Next
@@ -46,7 +46,7 @@
     <v-flex
       xs12
       class="mt-2">
-      <v-sheet>
+      <v-sheet class="caption">
         <!-- now is normally calculated by itself, but to keep the calendar in this date range to view events -->
         <v-calendar
           ref="calendar"
@@ -67,8 +67,8 @@
           @click:date="viewDay"
           @click:time="freeSlot">
           <!-- the events at the top (all-day) -->
-          <template v-slot:dayHeadere="{ date }">
-
+          <template v-slot:dayHeader="{ date }">
+            <!-- <div class="red--text">Ho</div> -->
           </template>
           <!-- the events at the bottom (timed) -->
           <template v-slot:dayBody="{ date, timeToY, minutesToPixels }">
@@ -91,8 +91,8 @@
 </template>
 
 <script>
+import WorksService from '@/services/WorksService'
 import moment from 'moment'
-
 moment.locale('es')
 
 const stylings = {
@@ -123,44 +123,46 @@ export default {
     maxDays: 6,
     weekdays: [1, 2, 3, 4, 5, 6, 0],
     // today: moment().format('YYYY-MM-DD'),
-    today: '2019-01-10',
+    // today: '2019-01-10',
+    today: '2019-03-14',
     start: moment(this.today).day(1).format('YYYY-MM-DD'),
     end: moment(this.today).day(0).format('YYYY-MM-DD'),
     intervals: { first: 15, minutes: 30, count: 26, height: 40 },
     styleInterval: 'workday',
-    events: [
-      {
-        title: 'Weekly Meeting',
-        date: '2019-01-07',
-        time: '09:00',
-        duration: 30
-      },
-      {
-        title: 'Weekly Meeting2',
-        date: '2019-01-07',
-        time: '09:30',
-        duration: 30
-      },
-      {
-        title: 'Weekly Meeting3',
-        date: '2019-01-08',
-        time: '09:30',
-        duration: 30
-      },
-      {
-        title: 'Thomas\' Birthday',
-        date: '2019-01-10',
-        time: '09:00',
-        duration: 300,
-        vacation: true
-      },
-      {
-        title: 'Mash Potatoes',
-        date: '2019-01-09',
-        time: '12:30',
-        duration: 30
-      }
-    ]
+    events: []
+    // events: [
+    //   {
+    //     title: 'Weekly Meeting',
+    //     date: '2019-01-07',
+    //     time: '09:00',
+    //     duration: 30
+    //   },
+    //   {
+    //     title: 'Weekly Meeting2',
+    //     date: '2019-01-07',
+    //     time: '09:30',
+    //     duration: 30
+    //   },
+    //   {
+    //     title: 'Weekly Meeting3',
+    //     date: '2019-01-08',
+    //     time: '09:30',
+    //     duration: 30
+    //   },
+    //   {
+    //     title: 'Thomas\' Birthday',
+    //     date: '2019-01-10',
+    //     time: '09:00',
+    //     duration: 300,
+    //     vacation: true
+    //   },
+    //   {
+    //     title: 'Mash Potatoes',
+    //     date: '2019-01-09',
+    //     time: '12:30',
+    //     duration: 30
+    //   }
+    // ]
   }),
   computed: {
     // convert the list of events into a map of lists keyed by date
@@ -176,10 +178,23 @@ export default {
       return moment(this.start).format('MMMM')
     }
   },
-  mounted () {
+  async mounted () {
     // this.$refs.calendar.scrollToTime('08:00')
     this.start = moment(this.today).day(1).format('YYYY-MM-DD')
-    this.end = moment(this.today).day(0).format('YYYY-MM-DD')
+    this.end = moment(this.today).day(7).format('YYYY-MM-DD')
+
+    const dateStart = new Date(this.start).valueOf()
+    const dateEnd = new Date(this.end).valueOf()
+    this.works = (await WorksService.index(dateStart, dateEnd)).data
+    this.events = this.works.map(event => {
+      return {
+        title: event.name,
+        date: moment(event.datePicked).format('YYYY-MM-DD'),
+        time: event.hour,
+        duration: 30
+      }
+    })
+    // console.log(this.events)
   },
   methods: {
     changePrev () {
@@ -213,6 +228,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+  .v-calendar {
+    color: red;
+  }
   .event {
     overflow: hidden;
     text-overflow: ellipsis;

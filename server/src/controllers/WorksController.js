@@ -73,7 +73,7 @@ module.exports = {
   async post (req, res) {
     try { 
       const day = moment(new Date(req.body.datePicked)).format('YYYYMMDD')
-      const hour = moment(new Date(req.body.datePicked)).format('HHmm')
+      const hour = moment(new Date(req.body.datePicked)).format('HH:mm')
 
       const intendedSlot = {
         hour,
@@ -85,7 +85,9 @@ module.exports = {
         notes: req.body.notes || null,
         state: req.body.state || null,
       }
-      console.log(intendedSlot)
+      // console.log(intendedSlot)
+      // console.log(day)
+      // console.log(hour)
 
       await Promise.all([
         Calendar.find({day}).countDocuments(),
