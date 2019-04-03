@@ -54,7 +54,7 @@
 
           <v-text-field
             v-model="work.datePicked"
-            v-validate="'required|date_format:dd/MM/yyyy HH:mm'"
+            v-validate="'required|date_format:yyyy/MM/dd HH:mm'"
             :error-messages="errors.collect('datePicked')"
             :disabled=isDisabled
             label="Date Picked"
@@ -195,13 +195,9 @@ export default {
     const day = moment(parseInt(this.$store.state.route.params.datePicked)).format('YYYYMMDD')
     const workId = this.$store.state.route.params.workId
     this.work = (await WorksService.show(day, workId)).data
-    this.work.datePicked = moment(this.work.datePicked).format('DD/MM/YYYY HH:mm')
+    this.work.datePicked = moment(this.work.datePicked).format('YYYY/MM/DD HH:mm')
     this.originalDate = this.$store.state.route.params.datePicked
   }
-  // },
-  // components: {
-  //   Panel
-  // }
 }
 </script>
 

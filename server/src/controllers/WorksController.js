@@ -14,7 +14,7 @@ module.exports = {
 
       if (search !== "undefined") {
         await Calendar.aggregate([
-          {$match: {"day": {$gte: dayStart, $lt: dayEnd}}},
+          {$match: {"day": {$gte: dayStart, $lte: dayEnd}}},
           {$unwind: "$slots"},
           {$sort: {"slots.datePicked": 1}},
           {$group: {_id: null, slts: {$push : "$slots"}}},
@@ -31,7 +31,7 @@ module.exports = {
         })
       } else { 
         await Calendar.aggregate([
-          {$match: {"day": {$gte: dayStart, $lt: dayEnd}}},
+          {$match: {"day": {$gte: dayStart, $lte: dayEnd}}},
           {$unwind: "$slots"},
           {$sort: {"slots.datePicked": 1}},
           {$group: {_id: null, slts: {$push : "$slots"}}},

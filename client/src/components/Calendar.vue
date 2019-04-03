@@ -124,9 +124,9 @@ export default {
     weekdays: [1, 2, 3, 4, 5, 6, 0],
     // today: moment().format('YYYY-MM-DD'),
     // today: '2019-01-10',
-    today: '2019-03-14',
+    today: '2019-02-28',
     start: moment(this.today).day(1).format('YYYY-MM-DD'),
-    end: moment(this.today).day(0).format('YYYY-MM-DD'),
+    end: moment(this.today).day(7).format('YYYY-MM-DD'),
     intervals: { first: 15, minutes: 30, count: 26, height: 40 },
     styleInterval: 'workday',
     events: []
@@ -179,43 +179,54 @@ export default {
     }
   },
   async mounted () {
-    // this.$refs.calendar.scrollToTime('08:00')
-    this.start = moment(this.today).day(1).format('YYYY-MM-DD')
-    this.end = moment(this.today).day(7).format('YYYY-MM-DD')
-
-    const dateStart = new Date(this.start).valueOf()
-    const dateEnd = new Date(this.end).valueOf()
-    this.works = (await WorksService.index(dateStart, dateEnd)).data
-    this.events = this.works.map(event => {
-      return {
-        title: event.name,
-        date: moment(event.datePicked).format('YYYY-MM-DD'),
-        time: event.hour,
-        duration: 30
-      }
-    })
-    // console.log(this.events)
+    await this.getEvents()
   },
   methods: {
-    changePrev () {
-      this.$refs.calendar.prev()
+    async getEvents () {
       this.start = moment(this.today).day(1).format('YYYY-MM-DD')
-      this.end = moment(this.today).day(0).format('YYYY-MM-DD')
-      console.log(this.today)
+      this.end = moment(this.today).day(7).format('YYYY-MM-DD')
+
+      const dateStart = new Date(this.start).valueOf()
+      const dateEnd = new Date(this.end).valueOf()
+      const works = (await WorksService.index(dateStart, dateEnd)).data
+      this.events = works.map(event => {
+        return {
+          title: event.name,
+          date: moment(event.datePicked).format('YYYY-MM-DD'),
+          time: event.hour,
+          datePicked: event.datePicked,
+          _id: event._id,
+          duration: 30
+        }
+      })
     },
-    changeNext () {
+    async changePrev () {
+      this.$refs.calendar.prev()
+      await this.getEvents()
+    },
+    async changeNext () {
       this.$refs.calendar.next()
-      this.start = moment(this.today).day(1).format('YYYY-MM-DD')
-      this.end = moment(this.today).day(0).format('YYYY-MM-DD')
+      await this.getEvents()
     },
     ocuppiedSlot (event) {
-      alert(event.title)
-      console.log(this.today)
-      console.log(this.start)
-      console.log(this.end)
+      this.$router.push({
+        name: 'work',
+        params: {
+          datePicked: new Date(event.datePicked).valueOf(),
+          workId: event._id
+        }
+      })
     },
     freeSlot (event) {
-      console.log(event.date, event.hour, event.minute < 30 ? 0 : 30)
+      const intendedMinute = event.minute < 30 ? '00' : '30'
+      const intendedDate = new Date(`${event.date} ${event.hour}:${intendedMinute}`).valueOf()
+
+      this.$router.push({
+        name: 'works-create',
+        params: {
+          datePicked: intendedDate
+        }
+      })
     },
     viewDay (event) {
       console.log(event.date)

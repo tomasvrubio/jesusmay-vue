@@ -38,7 +38,7 @@ export default new Router({
       component: ViewWork
     },
     {
-      path: '/works/create',
+      path: '/works/create/:datePicked',
       name: 'works-create',
       component: CreateWork
     },

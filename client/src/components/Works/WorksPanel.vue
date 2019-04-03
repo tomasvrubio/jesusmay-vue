@@ -3,7 +3,10 @@
     <v-btn
       slot="action"
       :to="{
-        name: 'works-create'
+        name: 'works-create',
+        params: {
+          datePicked: 0
+        }
       }"
       class="white"
       light

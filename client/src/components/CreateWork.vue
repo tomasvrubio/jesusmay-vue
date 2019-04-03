@@ -83,6 +83,7 @@
 
 <script>
 // import Panel from '@/components/Panel'
+import moment from 'moment'
 import WorksService from '@/services/WorksService'
 
 export default {
@@ -118,6 +119,13 @@ export default {
       } catch (err) {
         console.log(err)
       }
+    }
+  },
+  async mounted () {
+    const intendedDate = this.$store.state.route.params.datePicked
+
+    if (intendedDate) {
+      this.work.datePicked = moment(parseInt(intendedDate)).format('YYYY/MM/DD HH:mm')
     }
   }
   // },
