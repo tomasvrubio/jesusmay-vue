@@ -52,6 +52,115 @@
             required
           ></v-text-field>
 
+          <v-layout row wrap>
+            <v-flex xs11 sm3 md3>
+              <!-- <v-menu
+                ref="menu"
+                v-model="menu"
+                :close-on-content-click="false"
+                :nudge-right="40"
+                :return-value.sync="date"
+                lazy
+                transition="scale-transition"
+                offset-y
+                full-width
+                min-width="290px"
+              >
+                <template v-slot:activator="{ on }">
+                  <v-text-field
+                    v-model="date"
+                    label="Dia reserva"
+                    prepend-icon="event"
+                    readonly
+                    v-on="on"
+                  ></v-text-field>
+                </template>
+                <v-date-picker
+                  v-model="date"
+                  locale="es"
+                  no-title scrollable
+                  :allowed-dates="allowedDates"
+                  class="mt-3"
+                  :min=minDate
+                  :max=maxDate
+                  @change="$refs.menu.save(date)"
+                >
+                  <v-spacer></v-spacer>
+                  <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
+                  <v-btn flat color="primary" @click="$refs.menu.save(date)">OK</v-btn>
+                </v-date-picker>
+              </v-menu> -->
+
+              <v-menu
+                v-model="menu1"
+                :close-on-content-click="false"
+                :nudge-right="40"
+                lazy
+                transition="scale-transition"
+                offset-y
+                full-width
+                min-width="290px"
+              >
+                <template v-slot:activator="{ on }">
+                  <v-text-field
+                    :value="date"
+                    clearable
+                    label="Dia Reserva"
+                    prepend-icon="event"
+                    readonly
+                    v-on="on"
+                  ></v-text-field>
+                </template>
+                <v-date-picker
+                  v-model="date"
+                  locale="es"
+                  no-title
+                  class="mt-3"
+                  :allowed-dates="allowedDates"
+                  :min=minDate
+                  :max=maxDate
+                  @change="menu1 = false"
+                ></v-date-picker>
+              </v-menu>
+            </v-flex>
+
+            <v-flex xs11 sm3 md3>
+              <v-menu
+                ref="menu"
+                v-model="menu2"
+                :close-on-content-click="false"
+                :nudge-right="40"
+                :return-value.sync="time"
+                lazy
+                transition="scale-transition"
+                offset-y
+                full-width
+                max-width="290px"
+                min-width="290px"
+              >
+                <template v-slot:activator="{ on }">
+                  <v-text-field
+                    v-model="time"
+                    :disabled=isDisabled
+                    locale="es"
+                    label="Hora reserva"
+                    prepend-icon="access_time"
+                    readonly
+                    v-on="on"
+                  ></v-text-field>
+                </template>
+                <v-time-picker
+                  v-if="menu2"
+                  v-model="time"
+                  full-width
+                  format="24hr"
+                  :allowed-minutes="allowedStep"
+                  @click:minute="$refs.menu.save(time)"
+                ></v-time-picker>
+              </v-menu>
+            </v-flex>
+          </v-layout>
+
           <v-text-field
             v-model="work.datePicked"
             v-validate="'required|date_format:yyyy/MM/dd HH:mm'"
@@ -115,8 +224,20 @@ export default {
       originalDate: null,
       required: (value) => !!value || 'Required.', // TODO: Cambiar con vuelidate
       error: null,
-      isDisabled: true
+      isDisabled: true,
+      date: new Date().toISOString().substr(0, 10), // datepicker
+      minDate: moment().format('YYYY-MM-DD'), // datepicker
+      maxDate: moment().add(14, 'days').format('YYYY-MM-DD'), // datepicker
+      menu: false, // datepicker
+      time: null, // hourpicker
+      menu2: false, // hourpicker
+      menu1: false
     }
+  },
+  computed: {
+    computedDateFormattedMomentjs () {
+        return this.date ? moment(this.date).format('dddd, MMMM Do YYYY') : ''
+      }
   },
   methods: {
     async edit () {
@@ -189,7 +310,9 @@ export default {
       } catch (err) {
         console.log(err)
       }
-    }
+    },
+    allowedDates: val => parseInt(val.split('-')[2], 10) % 2 === 0, // TODO: Hacerlo con los huecos que tengo libres en el calendario
+    allowedStep: m => m % 30 === 0 // TODO: Hacerlo con los huecos que tengo libres en el calendario
   },
   async mounted () {
     const day = moment(parseInt(this.$store.state.route.params.datePicked)).format('YYYYMMDD')
