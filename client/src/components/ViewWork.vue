@@ -53,46 +53,9 @@
           ></v-text-field>
 
           <v-layout row wrap>
-            <v-flex xs11 sm3 md3>
-              <!-- <v-menu
-                ref="menu"
-                v-model="menu"
-                :close-on-content-click="false"
-                :nudge-right="40"
-                :return-value.sync="date"
-                lazy
-                transition="scale-transition"
-                offset-y
-                full-width
-                min-width="290px"
-              >
-                <template v-slot:activator="{ on }">
-                  <v-text-field
-                    v-model="date"
-                    label="Dia reserva"
-                    prepend-icon="event"
-                    readonly
-                    v-on="on"
-                  ></v-text-field>
-                </template>
-                <v-date-picker
-                  v-model="date"
-                  locale="es"
-                  no-title scrollable
-                  :allowed-dates="allowedDates"
-                  class="mt-3"
-                  :min=minDate
-                  :max=maxDate
-                  @change="$refs.menu.save(date)"
-                >
-                  <v-spacer></v-spacer>
-                  <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
-                  <v-btn flat color="primary" @click="$refs.menu.save(date)">OK</v-btn>
-                </v-date-picker>
-              </v-menu> -->
-
+            <v-flex xs11 sm4 md3>
               <v-menu
-                v-model="menu1"
+                v-model="datePicker"
                 :close-on-content-click="false"
                 :nudge-right="40"
                 lazy
@@ -104,6 +67,7 @@
                 <template v-slot:activator="{ on }">
                   <v-text-field
                     :value="date"
+                    :disabled=isDisabled
                     clearable
                     label="Dia Reserva"
                     prepend-icon="event"
@@ -115,19 +79,21 @@
                   v-model="date"
                   locale="es"
                   no-title
-                  class="mt-3"
+                  scrollable
                   :allowed-dates="allowedDates"
                   :min=minDate
                   :max=maxDate
-                  @change="menu1 = false"
+                  @change="datePicker = false"
                 ></v-date-picker>
               </v-menu>
             </v-flex>
+            <v-flex sm1 md1>
+            </v-flex>
 
-            <v-flex xs11 sm3 md3>
+            <v-flex xs11 sm4 md3>
               <v-menu
                 ref="menu"
-                v-model="menu2"
+                v-model="hourPicker"
                 :close-on-content-click="false"
                 :nudge-right="40"
                 :return-value.sync="time"
@@ -150,7 +116,7 @@
                   ></v-text-field>
                 </template>
                 <v-time-picker
-                  v-if="menu2"
+                  v-if="hourPicker"
                   v-model="time"
                   full-width
                   format="24hr"
@@ -162,10 +128,10 @@
           </v-layout>
 
           <v-text-field
-            v-model="work.datePicked"
+            v-model="fullDate"
             v-validate="'required|date_format:yyyy/MM/dd HH:mm'"
             :error-messages="errors.collect('datePicked')"
-            :disabled=isDisabled
+            disabled
             label="Date Picked"
             data-vv-name="datePicked"
             class="required"
@@ -225,19 +191,18 @@ export default {
       required: (value) => !!value || 'Required.', // TODO: Cambiar con vuelidate
       error: null,
       isDisabled: true,
+      datePicker: false,
       date: new Date().toISOString().substr(0, 10), // datepicker
       minDate: moment().format('YYYY-MM-DD'), // datepicker
       maxDate: moment().add(14, 'days').format('YYYY-MM-DD'), // datepicker
-      menu: false, // datepicker
-      time: null, // hourpicker
-      menu2: false, // hourpicker
-      menu1: false
+      hourPicker: false, // hourpicker
+      time: null // hourpicker
     }
   },
   computed: {
-    computedDateFormattedMomentjs () {
-        return this.date ? moment(this.date).format('dddd, MMMM Do YYYY') : ''
-      }
+    fullDate: function () {
+      return ((this.date && this.time) ? new Date(`${this.date} ${this.time}`) : null)
+    }
   },
   methods: {
     async edit () {
@@ -320,6 +285,9 @@ export default {
     this.work = (await WorksService.show(day, workId)).data
     this.work.datePicked = moment(this.work.datePicked).format('YYYY/MM/DD HH:mm')
     this.originalDate = this.$store.state.route.params.datePicked
+
+    this.date = moment(this.work.datePicked).format('YYYY-MM-DD')
+    this.time = moment(this.work.datePicked).format('HH:mm')
   }
 }
 </script>
