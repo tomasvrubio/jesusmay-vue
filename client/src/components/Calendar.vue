@@ -238,9 +238,9 @@ export default {
 }
 </script>
 
-<style lang="stylus" scoped>
-  .v-calendar {
-    color: red;
+<style lang="stylus">
+  .v-calendar-daily_head-day-label {
+    font-size: 30px;
   }
   .event {
     overflow: hidden;

@@ -1,6 +1,6 @@
 <template>
   <v-layout row>
-    <v-flex xs8 offset-xs2>
+    <v-flex xs10 offset-xs1>
       <works-search-panel />
       <works-panel class="mt-2"/>
     </v-flex>

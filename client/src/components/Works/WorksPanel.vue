@@ -77,6 +77,7 @@ export default {
     '$route.query.search': {
       inmediate: true,
       async handler (value) {
+        console.log('$route.query.search')
         // this.works = await WorksService.index2(value).data
         const dateStart = new Date('2019 03 01').valueOf()
         const dateEnd = new Date('2019 04 01').valueOf()

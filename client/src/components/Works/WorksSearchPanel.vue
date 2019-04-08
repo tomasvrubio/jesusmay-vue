@@ -1,11 +1,7 @@
 <template>
   <panel title="Search">
-    <v-text-field
-      label="Search works by name, phone, email..."
-      v-model="search"
-    ></v-text-field>
     <v-layout row wrap>
-      <v-flex xs11 md4>
+      <v-flex xs8 sm5 md4>
         <v-menu
           v-model="datePicker1"
           :close-on-content-click="false"
@@ -35,9 +31,9 @@
           ></v-date-picker>
         </v-menu>
       </v-flex>
-      <v-flex md1>
+      <v-flex sm1>
       </v-flex>
-            <v-flex xs11 md4>
+            <v-flex xs8 sm5 md4>
         <v-menu
           v-model="datePicker2"
           :close-on-content-click="false"
@@ -68,6 +64,10 @@
         </v-menu>
       </v-flex>
     </v-layout>
+    <v-text-field
+      label="Search works by name, phone, email..."
+      v-model="search"
+    ></v-text-field>
   </panel>
 </template>
 
@@ -92,16 +92,59 @@ export default {
       }
       if (this.search !== '') {
         route.query = {
-          search: this.search
+          search: this.search,
+          dateStart: this.dateStart,
+          dateEnd: this.dateEnd
         }
       }
       this.$router.push(route)
     }, 700),
+    dateStart: async function (value) {
+      const route = {
+        name: 'works'
+      }
+      if (this.search !== '') {
+        route.query = {
+          search: this.search,
+          dateStart: this.dateStart,
+          dateEnd: this.dateEnd
+        }
+      }
+      this.$router.push(route)
+    },
+    dateEnd: async function (value) {
+      const route = {
+        name: 'works'
+      }
+      if (this.search !== '') {
+        route.query = {
+          search: this.search,
+          dateStart: this.dateStart,
+          dateEnd: this.dateEnd
+        }
+      }
+      this.$router.push(route)
+    },
     '$route.query.search': {
       inmediate: true,
       handler (value) {
         this.search = value
       }
+    }
+  },
+  method: {
+    async updateRouteQuery () {
+      const route = {
+        name: 'works'
+      }
+      if (this.search !== '') {
+        route.query = {
+          search: this.search,
+          dateStart: this.dateStart,
+          dateEnd: this.dateEnd
+        }
+      }
+      this.$router.push(route)
     }
   }
 }
