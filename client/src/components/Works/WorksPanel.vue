@@ -74,14 +74,13 @@ export default {
     // }
   },
   watch: {
-    '$route.query.search': {
+    '$route.query': {
       inmediate: true,
       async handler (value) {
-        console.log('$route.query.search')
-        // this.works = await WorksService.index2(value).data
-        const dateStart = new Date('2019 03 01').valueOf()
-        const dateEnd = new Date('2019 04 01').valueOf()
-        this.works = (await WorksService.index(dateStart, dateEnd, value)).data
+        const search = value.search
+        const dateStart = new Date(value.dateStart).valueOf()
+        const dateEnd = new Date(value.dateEnd).valueOf()
+        this.works = (await WorksService.index(dateStart, dateEnd, search)).data
       }
     }
   },

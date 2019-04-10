@@ -66,7 +66,7 @@
               >
                 <template v-slot:activator="{ on }">
                   <v-text-field
-                    :value="date"
+                    :value="picker.date"
                     :disabled=isDisabled
                     clearable
                     label="Dia Reserva"
@@ -76,13 +76,13 @@
                   ></v-text-field>
                 </template>
                 <v-date-picker
-                  v-model="date"
+                  v-model="picker.date"
                   locale="es"
                   no-title
                   scrollable
                   :allowed-dates="allowedDates"
-                  :min=minDate
-                  :max=maxDate
+                  :min=minDatePicker
+                  :max=maxDatePicker
                   @change="datePicker = false"
                 ></v-date-picker>
               </v-menu>
@@ -93,11 +93,11 @@
             <v-flex xs11 sm4 md3>
               <v-menu
                 ref="menu"
-                v-model="hourPicker"
+                v-model="timePicker"
                 :close-on-content-click="false"
                 :nudge-right="40"
-                :return-value.sync="time"
-                lazy
+                :return-value.sync="picker.time"
+                lazytime
                 transition="scale-transition"
                 offset-y
                 full-width
@@ -106,7 +106,7 @@
               >
                 <template v-slot:activator="{ on }">
                   <v-text-field
-                    v-model="time"
+                    v-model="picker.time"
                     :disabled=isDisabled
                     locale="es"
                     label="Hora reserva"
@@ -116,19 +116,19 @@
                   ></v-text-field>
                 </template>
                 <v-time-picker
-                  v-if="hourPicker"
-                  v-model="time"
+                  v-if="timePicker"
+                  v-model="picker.time"
                   full-width
                   format="24hr"
                   :allowed-minutes="allowedStep"
-                  @click:minute="$refs.menu.save(time)"
+                  @click:minute="$refs.menu.save(picker.time)"
                 ></v-time-picker>
               </v-menu>
             </v-flex>
           </v-layout>
 
           <v-text-field
-            v-model="fullDate"
+            v-model="work.datePicked"
             v-validate="'required|date_format:yyyy/MM/dd HH:mm'"
             :error-messages="errors.collect('datePicked')"
             disabled
@@ -191,17 +191,35 @@ export default {
       required: (value) => !!value || 'Required.', // TODO: Cambiar con vuelidate
       error: null,
       isDisabled: true,
+      picker: {
+        date: null,
+        time: null
+      },
       datePicker: false,
-      date: new Date().toISOString().substr(0, 10), // datepicker
-      minDate: moment().format('YYYY-MM-DD'), // datepicker
-      maxDate: moment().add(14, 'days').format('YYYY-MM-DD'), // datepicker
-      hourPicker: false, // hourpicker
-      time: null // hourpicker
+      timePicker: false,
+      minDatePicker: moment().format('YYYY-MM-DD'),
+      maxDatePicker: moment().add(14,'days').format('YYYY-MM-DD')
     }
   },
   computed: {
     fullDate: function () {
-      return ((this.date && this.time) ? new Date(`${this.date} ${this.time}`) : null)
+      return ((this.picker.date && this.picker.time) ? new Date(`${this.picker.date} ${this.picker.time}`) : null)
+    }
+  },
+  watch: {
+    'work.datePicked': {
+      inmediate: true,
+      handler (value) {
+        this.picker.date = moment(value).format('YYYY-MM-DD')
+        this.picker.time = moment(value).format('HH:mm')
+      }
+    },
+    'fullDate': {
+      inmediate: true,
+      handler (value) {
+        console.log(value)
+        this.work.datePicked = this.fullDate
+      }
     }
   },
   methods: {
@@ -280,14 +298,14 @@ export default {
     allowedStep: m => m % 30 === 0 // TODO: Hacerlo con los huecos que tengo libres en el calendario
   },
   async mounted () {
+    // Get parameters from store
     const day = moment(parseInt(this.$store.state.route.params.datePicked)).format('YYYYMMDD')
     const workId = this.$store.state.route.params.workId
+    // Get Work data from DB
     this.work = (await WorksService.show(day, workId)).data
-    this.work.datePicked = moment(this.work.datePicked).format('YYYY/MM/DD HH:mm')
+    // this.work.datePicked = moment(this.work.datePicked).format('YYYY/MM/DD HH:mm')
+    // Keep this to check if date was modified when saving
     this.originalDate = this.$store.state.route.params.datePicked
-
-    this.date = moment(this.work.datePicked).format('YYYY-MM-DD')
-    this.time = moment(this.work.datePicked).format('HH:mm')
   }
 }
 </script>

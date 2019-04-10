@@ -33,7 +33,6 @@
             required
           ></v-text-field>
 
-          <!-- TODO: Aquí tengo que poner un datePicker -->
           <v-text-field
             v-model="work.datePicked"
             v-validate="'required|date_format:yyyy/MM/dd HH:mm'"
@@ -43,6 +42,81 @@
             class="required"
             required
           ></v-text-field>
+
+          <v-layout row wrap>
+            <v-flex xs11 sm6 md6>
+              <v-menu
+                v-model="datePicker"
+                :close-on-content-click="false"
+                :nudge-right="40"
+                lazy
+                transition="scale-transition"
+                offset-y
+                full-width
+                min-width="290px"
+              >
+                <template v-slot:activator="{ on }">
+                  <v-text-field
+                    :value="picker.date"
+                    :disabled=isDisabled
+                    clearable
+                    label="Dia Reserva"
+                    prepend-icon="event"
+                    readonly
+                    v-on="on"
+                  ></v-text-field>
+                </template>
+                <v-date-picker
+                  v-model="picker.date"
+                  locale="es"
+                  no-title
+                  scrollable
+                  :allowed-dates="allowedDates"
+                  :min=minDatePicker
+                  :max=maxDatePicker
+                  @change="datePicker = false"
+                ></v-date-picker>
+              </v-menu>
+            </v-flex>
+
+            <v-flex md1 />
+
+            <v-flex xs11 sm6 md6>
+              <v-menu
+                ref="menu"
+                v-model="timePicker"
+                :close-on-content-click="false"
+                :nudge-right="40"
+                :return-value.sync="picker.time"
+                lazytime
+                transition="scale-transition"
+                offset-y
+                full-width
+                max-width="290px"
+                min-width="290px"
+              >
+                <template v-slot:activator="{ on }">
+                  <v-text-field
+                    v-model="picker.time"
+                    :disabled=isDisabled
+                    locale="es"
+                    label="Hora reserva"
+                    prepend-icon="access_time"
+                    readonly
+                    v-on="on"
+                  ></v-text-field>
+                </template>
+                <v-time-picker
+                  v-if="timePicker"
+                  v-model="picker.time"
+                  full-width
+                  format="24hr"
+                  :allowed-minutes="allowedStep"
+                  @click:minute="$refs.menu.save(picker.time)"
+                ></v-time-picker>
+              </v-menu>
+            </v-flex>
+          </v-layout>
         </panel>
       </v-flex>
 
@@ -97,9 +171,38 @@ export default {
         category: 'Corte',
         notes: null
       },
-      error: null
+      error: null,
+      picker: {
+        date: null,
+        time: null
+      },
+      datePicker: false,
+      timePicker: false,
+      minDatePicker: moment().format('YYYY-MM-DD'),
+      maxDatePicker: moment().add(14,'days').format('YYYY-MM-DD')
     }
   },
+  computed: {
+    fullDate: function () {
+      return ((this.picker.date && this.picker.time) ? new Date(`${this.picker.date} ${this.picker.time}`) : null)
+    }
+  },
+  watch: {
+    'work.datePicked': {
+      inmediate: true,
+      handler (value) {
+        this.picker.date = moment(value).format('YYYY-MM-DD')
+        this.picker.time = moment(value).format('HH:mm')
+      }
+    },
+    'fullDate': {
+      inmediate: true,
+      handler (value) {
+        console.log(value)
+        this.work.datePicked = this.fullDate
+      }
+    }
+  },  
   methods: {
     async create () {
       this.error = null

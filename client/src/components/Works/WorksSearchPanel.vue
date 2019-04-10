@@ -16,7 +16,7 @@
             <v-text-field
               :value="dateStart"
               clearable
-              label="Dia Reserva"
+              label="Fecha inicio búsqueda"
               prepend-icon="event"
               readonly
               v-on="on"
@@ -48,7 +48,7 @@
             <v-text-field
               :value="dateEnd"
               clearable
-              label="Dia Reserva"
+              label="Fecha fin búsqueda"
               prepend-icon="event"
               readonly
               v-on="on"
@@ -65,7 +65,7 @@
       </v-flex>
     </v-layout>
     <v-text-field
-      label="Search works by name, phone, email..."
+      label="Search works by name, phone or email"
       v-model="search"
     ></v-text-field>
   </panel>
@@ -86,54 +86,33 @@ export default {
     }
   },
   watch: {
-    search: _.debounce(async function (value) {
-      const route = {
-        name: 'works'
-      }
-      if (this.search !== '') {
-        route.query = {
-          search: this.search,
-          dateStart: this.dateStart,
-          dateEnd: this.dateEnd
-        }
-      }
-      this.$router.push(route)
+    search: _.debounce(function () {
+      this.updateRouteQuery()
     }, 700),
-    dateStart: async function (value) {
-      const route = {
-        name: 'works'
-      }
-      if (this.search !== '') {
-        route.query = {
-          search: this.search,
-          dateStart: this.dateStart,
-          dateEnd: this.dateEnd
-        }
-      }
-      this.$router.push(route)
+    dateStart: {
+      handler: function () {
+        this.updateRouteQuery()
+      },
+      deep: true
     },
-    dateEnd: async function (value) {
-      const route = {
-        name: 'works'
-      }
-      if (this.search !== '') {
-        route.query = {
-          search: this.search,
-          dateStart: this.dateStart,
-          dateEnd: this.dateEnd
-        }
-      }
-      this.$router.push(route)
+    dateEnd: {
+      handler: function () {
+        this.updateRouteQuery()
+      },
+      deep: true
     },
-    '$route.query.search': {
+    // Cambiarlo a sólo route.query y sacar de ahí los 3 valores. ¿Realmente necesito tener este watcher?
+    '$route.query': {
       inmediate: true,
       handler (value) {
-        this.search = value
+        this.search = value.search
+        this.dateStart = value.dateStart
+        this.dateEnd = value.dateEnd
       }
     }
   },
-  method: {
-    async updateRouteQuery () {
+  methods: {
+    updateRouteQuery: async function () {
       const route = {
         name: 'works'
       }
